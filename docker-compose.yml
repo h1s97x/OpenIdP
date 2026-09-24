@@ -1,0 +1,102 @@
+services:
+  # ---------- 主应用容器 ----------
+  openidp:
+    image: h1s97x/openidp:latest
+    container_name: openidp
+    restart: always
+    ports:
+      - "6099:6099"
+    networks:
+      - openidp-net
+
+    environment:
+      # ---------- 数据库（PostgreSQL / MySQL / MariaDB；未配置或不可用时自动降级 SQLite）----------
+      - OPENIDP_DATABASE_TYPE=postgres
+      - OPENIDP_DATABASE_HOST=openidp-postgresql
+      - OPENIDP_DATABASE_USER=openidp
+      - OPENIDP_DATABASE_NAME=openidp
+      - OPENIDP_DATABASE_PORT=5432
+      # 数据库密码：从环境变量 OPENIDP_DATABASE_PASSWORD 读取，默认 openidp123
+      - OPENIDP_DATABASE_PASSWORD=${OPENIDP_DATABASE_PASSWORD:-openidp123}
+      - OPENIDP_DATABASE_SSL_MODE=disable
+      # Redis 配置（可选）：想使用 Redis 保持下面两行；不想使用可注释掉，应用会自动降级到内存缓存
+      - OPENIDP_REDIS_ADDR=openidp-redis:6379
+      # Redis 密码：从环境变量 OPENIDP_REDIS_PASSWORD 读取，默认不设密码
+      - OPENIDP_REDIS_PASSWORD=${OPENIDP_REDIS_PASSWORD:-}
+      # 真实客户端 IP：默认解析转发头（OPENIDP_TRUST_PROXY=true）。
+      # ⚠️ 仅在可信网络下才应采信转发头：经 CDN / 反代接入时还需配置 OPENIDP_TRUSTED_PROXIES
+      #    并把可信网段（含 CDN 回源段）列入白名单；若容器直接暴露给公网，应设为 false，
+      #    否则客户端可伪造 X-Forwarded-For 绕过基于 IP 的限流与审计。
+      - OPENIDP_TRUST_PROXY=true
+      # 系统时区（IANA 名）：默认 Asia/Shanghai（UTC+8）
+      - OPENIDP_TIMEZONE=${OPENIDP_TIMEZONE:-Asia/Shanghai}
+
+    depends_on:
+      openidp-postgresql:
+        condition: service_healthy
+      openidp-redis:
+        condition: service_healthy
+
+    volumes:
+      - ./data:/app/data
+
+  # ---------- PostgreSQL 17-alpine（必需；未配置或不可用时自动降级 SQLite）----------
+  # 如需 MySQL / MariaDB：修改 OPENIDP_DATABASE_TYPE=mysql/mariadb，并替换为本服务的 MySQL 容器。
+  openidp-postgresql:
+    image: postgres:17-alpine
+    container_name: openidp-postgresql
+    restart: unless-stopped
+    expose:
+      - "5432"
+    networks:
+      - openidp-net
+    environment:
+      POSTGRES_DB: openidp
+      POSTGRES_USER: openidp
+      # 与主服务 OPENIDP_DATABASE_PASSWORD 保持一致（默认 openidp123）
+      POSTGRES_PASSWORD: ${OPENIDP_DATABASE_PASSWORD:-openidp123}
+    command: ["postgres"]
+    volumes:
+      - openidp-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openidp -d openidp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ---------- Redis 7.4-alpine（可选；不需要可整段注释）----------
+  # 如果不使用 Redis，注释掉并移除本服务 + depends_on 依赖 + volumes 末尾的 openidp-redis-data，
+  # 应用会自动降级到内存缓存。
+  openidp-redis:
+    image: redis:7.4-alpine
+    container_name: openidp-redis
+    restart: unless-stopped
+    expose:
+      - "6379"
+    networks:
+      - openidp-net
+    # 若设置了 OPENIDP_REDIS_PASSWORD 则以 requirepass 启用认证（留空则不设置密码）
+    command: >
+      sh -c 'if [ -n "$$OPENIDP_REDIS_PASSWORD" ]; then
+        exec redis-server --appendonly yes --requirepass "$$OPENIDP_REDIS_PASSWORD";
+      else
+        exec redis-server --appendonly yes;
+      fi'
+    environment:
+      # Redis 密码：从环境变量 OPENIDP_REDIS_PASSWORD 读取
+      - OPENIDP_REDIS_PASSWORD=${OPENIDP_REDIS_PASSWORD:-}
+    volumes:
+      - openidp-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+networks:
+  openidp-net:
+    driver: bridge
+
+volumes:
+  openidp-postgres-data:
+  openidp-redis-data:
