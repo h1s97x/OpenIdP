@@ -1,0 +1,16 @@
+OpenIdP
+Copyright (c) 2026 h1s97x
+
+This product includes software developed as part of the following open
+source project, used under the terms of the MIT License:
+
+  Nimbus (云坠通行证)
+  Copyright (c) 2026 Yunzhui (云坠)
+  Licensed under the MIT License.
+
+OpenIdP is a derivative work: it keeps the original project's MIT-licensed
+architecture and functionality as a starting point, and applies its own
+branding, module layout and configuration layer on top.
+
+The original copyright notice and the full MIT license text are retained
+verbatim in the LICENSE file, as required by the license terms.

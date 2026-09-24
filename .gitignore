@@ -1,0 +1,38 @@
+node_modules/
+*.log
+.DS_Store
+api/server
+# 单二进制构建产物不入库；由 `make build` 生成
+api/openidp
+api/*.exe
+*.exe~
+web/.vite/
+api/data/
+web/tsconfig.tsbuildinfo
+web/shots/
+.pnpm-store/
+# 本地缓存 / 编辑器 / 工具目录不入库
+.cache/
+.vscode/
+.workbuddy/
+# 前端构建产物（web/dist）不入库
+web/dist/
+# 内嵌前端构建产物不入库；由 `make build` / `make embed` 复制 web/dist 到此处
+api/cmd/server/dist/
+api/data/
+test-data/
+
+# 环境变量（可选覆盖配置，不入库；密钥已内置，默认无需配置）
+.env
+
+# Docker Compose 数据目录（挂载到主容器 /app/data）
+data/
+
+# 本地开发/调试产物不入库
+main_5173.js
+main_6099.js
+rr_5173.js
+openidp_5173.html
+openidp_6099.html
+.commit-msg-*.txt
+.workbuddy-ai/

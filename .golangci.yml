@@ -1,0 +1,22 @@
+# golangci-lint 配置（OpenIdP API）
+# 安装：https://golangci-lint.run/
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - errcheck
+    - ineffassign
+    - unused
+    - misspell
+    - gofmt
+
+issues:
+  exclude-rules:
+    # 代码评审中已确认的吞错场景保留（DB 写失败不影响主流程的可选记录）
+    - linters:
+        - errcheck
+      text: "_, _ ="
