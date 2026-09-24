@@ -1,0 +1,302 @@
+@import "tailwindcss";
+
+/* 设计令牌（oklch，Light + Dark） */
+@theme {
+  /* 未设置字体偏好时的兜底即浏览器默认字族（system 档同源），
+     避免默认状态回落到朱雀仿宋，使「系统默认」名不副实。 */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-zhuque-fangsong: "Zhuque Fangsong (technical preview)", serif;
+  --font-jinbuti: "DingTalk JinBuTi", serif;
+  --font-guankiap-tsingkhai: "GuanKiapTsingKhai", serif;
+
+  --radius: 0.625rem;
+  --radius-3xl: 1.5rem;
+}
+
+/* 语义颜色令牌注册：使用 @theme inline 映射，生成 bg-card / bg-popover / text-foreground 等工具类。
+   缺少这段会导致所有语义背景/文字工具类无法生成，界面背景透明。 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  /* 浅色令牌：纯中性灰阶（chroma=0）+ 低饱和品牌蓝。
+     混色一律用 oklab：底色 chroma=0 时 oklch 极坐标插值会取到错误色相（偏粉）。 */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.692 0.141 243.716);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.42 0.16 250);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.49 0 0);
+  --accent: color-mix(in oklab, var(--primary) 12%, var(--background));
+  --accent-foreground: oklch(0.145 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.596 0.145 163.225);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.681 0.162 75.834);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.588 0.158 241.966);
+  --info-foreground: oklch(0.985 0 0);
+  --neutral: oklch(0.708 0 0);
+  --neutral-foreground: oklch(0.145 0 0);
+  --border: oklch(0.93 0 0);
+  --input: oklch(0.93 0 0);
+  --ring: oklch(0.708 0.16 249.003);
+  --chart-1: oklch(0.72 0.18 250);
+  --chart-2: oklch(0.65 0.15 200);
+  --chart-3: oklch(0.7 0.12 280);
+  --chart-4: oklch(0.68 0.19 325);
+  --chart-5: oklch(0.68 0.16 155);
+  --sidebar: color-mix(in oklab, var(--foreground) 0.5%, var(--background));
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.64 0.197 253.892);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: color-mix(in oklab, var(--primary) 12%, var(--background));
+  --sidebar-accent-foreground: oklch(0.579 0.196 255.909);
+  --sidebar-border: oklch(0.93 0 0);
+  --sidebar-ring: oklch(0.58 0.2 250);
+}
+
+.dark {
+  /* 深色令牌：炭灰画布（无彩中性灰）+ 同源品牌蓝，与浅色共用同一色相 */
+  --background: oklch(0.235 0 0);
+  --foreground: oklch(0.965 0 0);
+  --card: oklch(0.285 0 0);
+  --card-foreground: oklch(0.965 0 0);
+  --popover: oklch(0.305 0 0);
+  --popover-foreground: oklch(0.965 0 0);
+  --primary: oklch(0.54 0.142 248.516);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.335 0 0);
+  --secondary-foreground: oklch(0.9 0.05 250);
+  --muted: oklch(0.305 0 0);
+  --muted-foreground: oklch(0.78 0 0);
+  --accent: color-mix(in oklab, var(--primary) 20%, var(--background));
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.696 0.17 162.48);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.769 0.188 70.08);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.613 0.14 239.919);
+  --info-foreground: oklch(0.145 0 0);
+  --neutral: oklch(0.76 0 0);
+  --neutral-foreground: oklch(0.155 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 17%);
+  --ring: oklch(0.554 0.148 250.726);
+  --chart-1: oklch(0.76 0.14 250);
+  --chart-2: oklch(0.76 0.13 200);
+  --chart-3: oklch(0.76 0.13 285);
+  --chart-4: oklch(0.75 0.16 325);
+  --chart-5: oklch(0.76 0.14 155);
+  --sidebar: oklch(0.225 0 0);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.588 0.123 246.488);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: color-mix(in oklab, var(--primary) 20%, var(--background));
+  --sidebar-accent-foreground: oklch(0.9 0.05 250);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.7 0.17 250);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--app-font, var(--font-sans));
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* 隐藏滚动条但仍可滚动 */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- 细滚动条 ----
+   默认滚动条宽度过大、颜色偏重，在浅色卡片内容区里很抢眼。
+   这里统一收窄到 8px、轨道透明、滑块用柔和的半透明前景色，
+   悬停时略微加深；深色模式下亮度自动适配（currentColor 语义）。
+   同时设置 scrollbar-width: thin 覆盖 Firefox。 */
+main[data-layout="auto"] {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--muted-foreground) 28%, transparent) transparent;
+}
+main[data-layout="auto"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+main[data-layout="auto"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+main[data-layout="auto"]::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--muted-foreground) 28%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+main[data-layout="auto"]::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+}
+main[data-layout="auto"]::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ---- 侧栏子项面板展开/收回动画 ----
+   面板常驻 DOM，展开时由 JS 把实测高度写入
+   --collapsible-panel-height，再用 300ms ease-out 在 0 ↔ 实测高度之间做 height 过渡
+   （不用 max-height 猜值）。收起后 height:0 + overflow:hidden + inert，
+   Tab 键不会落进不可见子项；尊重 prefers-reduced-motion。 */
+.openidp-collapsible-content {
+  overflow: hidden;
+  /* 收起态兜底高度 0：首屏即收起时 JS 尚未（也无需）写入实测高度，
+     若此处无默认值，入场 keyframe 的 from 取值无效会回退为内容高度，
+     导致面板先整块弹出再收回的可见闪现。展开时 JS 以内联样式覆盖为实测值。 */
+  --collapsible-panel-height: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .openidp-collapsible-content[data-open] {
+    animation: openidp-slide-down 300ms ease-out;
+  }
+  .openidp-collapsible-content:not([data-open]) {
+    animation: openidp-slide-up 300ms ease-out;
+  }
+}
+.openidp-collapsible-content:not([data-open]) {
+  height: 0;
+}
+@keyframes openidp-slide-down {
+  from { height: 0; }
+  to { height: var(--collapsible-panel-height); }
+}
+@keyframes openidp-slide-up {
+  from { height: var(--collapsible-panel-height); }
+  to { height: 0; }
+}
+
+/* ---- 品牌 logo 的深色主题适配 ----
+   内置 logo（public/images/logo.svg）是单色黑，深色背景下几乎不可见；
+   <img> 内部读不到页面的 CSS 变量，因此按 src 精确反相。
+   若日后换成彩色 logo，删除本规则即可。
+   注意：这里用 .dark 类（应用内主题切换写入 <html>），而不用 Tailwind 的 dark: 变体
+   —— 后者在本项目编译为 @media (prefers-color-scheme: dark)，只跟随系统偏好。 */
+.dark img[src='/images/logo.svg'] {
+  filter: invert(1);
+}
+
+/* 路由切换顶部进度条 */
+@keyframes progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.animate-progress {
+  animation: progress 0.6s ease-out forwards;
+}
+
+/* Toast 右下角弹窗动画 */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 弹窗/遮罩淡入与缩放动画 */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- tw-animate-css 入场动画 ---- */
+@keyframes enter {
+  0% {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+    filter: blur(var(--tw-enter-blur, 0));
+  }
+}
+
+.animate-in {
+  animation: enter var(--tw-animation-duration, 0.15s) ease;
+}
+
+.fade-in {
+  --tw-enter-opacity: 0;
+}
+
+.slide-in-from-right-2 {
+  --tw-enter-translate-x: calc(2 * var(--spacing, 0.25rem));
+}

@@ -1,0 +1,10 @@
+// 外观设置示意图统一出口。
+export { IconSidebarInset } from './icon-sidebar-inset'
+export { IconSidebarFloating } from './icon-sidebar-floating'
+export { IconSidebarSidebar } from './icon-sidebar-sidebar'
+export { IconThemeDark } from './icon-theme-dark'
+export { IconThemeLight } from './icon-theme-light'
+export { IconThemeSystem } from './icon-theme-system'
+export { IconLayoutDefault } from './icon-layout-default'
+export { IconLayoutCompact } from './icon-layout-compact'
+export { IconLayoutFull } from './icon-layout-full'
